@@ -1,0 +1,8 @@
+{
+  "precip_rate": {
+    "template": "precipitation_rate"
+  },
+  "total_precip": {
+    "template": "precipitation_accumulation"
+  }
+}

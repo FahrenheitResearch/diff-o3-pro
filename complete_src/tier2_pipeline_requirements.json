@@ -1,0 +1,93 @@
+{
+  "timestamp": "2025-06-10T01:17:40.947721",
+  "base_measurements": {
+    "grib_file_size_mb": 390.2,
+    "netcdf_size_mb": 20.0,
+    "tier2_estimated_mb": 84.0,
+    "variables_tier1": 13,
+    "variables_tier2": 21,
+    "grid_points": 1905141,
+    "processing_time_minutes": 5
+  },
+  "single_file": {
+    "raw_grib_mb": 390.2,
+    "tier1_netcdf_mb": 52.0,
+    "tier2_netcdf_mb": 84.0,
+    "processing_time_min": 5,
+    "compression_ratio": 4.645238095238095
+  },
+  "daily": {
+    "files_count": 24,
+    "raw_grib_gb": 9.1453125,
+    "tier1_netcdf_gb": 1.21875,
+    "tier2_netcdf_gb": 1.96875,
+    "processing_hours": 2.0,
+    "download_time_hours": 0.8
+  },
+  "monthly": {
+    "files_count": 720,
+    "raw_grib_tb": 0.2679290771484375,
+    "tier1_netcdf_tb": 0.03570556640625,
+    "tier2_netcdf_tb": 0.05767822265625,
+    "processing_days": 2.5,
+    "download_days": 1.0
+  },
+  "yearly": {
+    "files_count": 8760,
+    "raw_grib_pb": 0.0031834021210670467,
+    "tier1_netcdf_pb": 0.0004242360591888428,
+    "tier2_netcdf_pb": 0.0006853044033050537,
+    "processing_weeks": 4.345238095238095,
+    "download_weeks": 1.7380952380952381
+  },
+  "scenarios": {
+    "development": {
+      "name": "Development/Testing",
+      "timeframe": "1 week, analysis only (F00)",
+      "files": 168,
+      "storage_gb": 13.78125,
+      "processing_hours": 14.0,
+      "description": "Quick testing and initial model development"
+    },
+    "training": {
+      "name": "Training Dataset",
+      "timeframe": "1 year, 6 forecast hours",
+      "files": 52560,
+      "storage_tb": 4.21051025390625,
+      "processing_weeks": 26.071428571428573,
+      "description": "Comprehensive training dataset for production model"
+    },
+    "research": {
+      "name": "Research Archive",
+      "timeframe": "5 years, 12 forecast hours",
+      "files_millions": 0.5256,
+      "storage_pb": 0.04111826419830322,
+      "processing_months": 60.21115143516991,
+      "description": "Full research archive for comprehensive climate/weather studies"
+    }
+  },
+  "bandwidth": {
+    "per_file_mb": 390.2,
+    "hourly_mb": 390.2,
+    "daily_gb": 9.1453125,
+    "weekly_gb": 64.01718749999999,
+    "monthly_tb": 0.2679290771484375,
+    "sustained_mbps": 0.867111111111111
+  },
+  "processing": {
+    "single_file_minutes": 5,
+    "parallel_factor": 4,
+    "memory_gb_per_file": 8,
+    "disk_io_intensive": true,
+    "cpu_cores_recommended": 8,
+    "ram_recommended_gb": 32,
+    "storage_type": "SSD recommended for processing speed"
+  },
+  "recommendations": {
+    "development": "Start with 1-week analysis-only dataset (~59 GB)",
+    "training": "Use 1-year subset with key forecast hours (~10 TB)",
+    "production": "Consider cloud storage and distributed processing",
+    "bandwidth": "Sustained 100+ Mbps recommended for real-time processing",
+    "storage": "Plan for 10-100x data expansion over time"
+  }
+}

@@ -1,0 +1,95 @@
+# HRRR Training Data Pipeline - Git Ignore File
+
+# Large training data files
+*.nc
+*.grib2
+*.grib
+*.idx
+
+# Training data directories
+april_2025_training/
+april_2025_full_research/
+batch_training_data/
+tier2_training_data/
+final_test/
+test_fixes/
+test_april/
+test_output/
+test_output_mock/
+real_hrrr_native_3km/
+hrrr_*_demo/
+
+# Processing outputs
+*.json
+!custom_filters.json
+!custom_workflows.json
+!tier2_pipeline_requirements.json
+!parameters/*.json
+
+# Logs
+*.log
+batch_processing.log
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Large model files
+*.pth
+*.pt
+*.ckpt
+*.h5
+*.hdf5
+
+# Conda environment files
+environment.yml.lock
+
+# System files
+.fuse_hidden*
