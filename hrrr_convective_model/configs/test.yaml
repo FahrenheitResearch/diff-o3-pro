@@ -1,0 +1,36 @@
+data:
+  zarr: "data/zarr/test/hrrr.zarr"
+  stats: "data/stats.json"
+  variables: ["REFC", "T2M", "D2M", "U10", "V10", "CAPE", "CIN"]
+training:
+  lead_hours: 1
+  batch_size: 1
+  num_workers: 0
+  epochs: 2  # Just 2 epochs for testing
+  lr: 1.0e-4
+  gradient_accumulation_steps: 2
+  checkpoint_every: 1
+  validate_every: 1
+  base_features: 32  # Smaller model for testing
+  warmup_epochs: 0
+  lr_schedule: "cosine"
+
+diffusion:
+  timesteps: 1000
+  beta_schedule: "cosine"
+  guidance_weight: 0.1
+  dropout_prob: 0.1
+  sampler: "dpm_solver_pp"
+  solver_order: 2
+  num_steps: 5  # Reduced for faster testing
+  ema_decay: 0.9999
+
+ensemble:
+  num_members: 4  # Small ensemble for testing
+  perturbation_samples: 2
+  blend_weight: 0.95
+
+evaluation:
+  eval_variables: ["T2M", "U10", "V10", "REFC"]
+  eval_lead_times: [1]
+  metrics: ["rmse", "crps", "spread"]

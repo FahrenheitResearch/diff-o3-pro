@@ -1,0 +1,100 @@
+# GRIB2 data files
+*.grib2
+*.grib2.*
+*.idx
+
+# Zarr data stores
+*.zarr/
+data/zarr/
+
+# Raw data
+data/raw/
+
+# Model checkpoints and weights
+*.pt
+*.pth
+*.ckpt
+checkpoints/
+ckpt_*.pt
+
+# Forecast outputs
+forecasts/
+*.nc
+
+# Visualization outputs
+*.png
+*.jpg
+*.jpeg
+*.gif
+maps/
+
+# Statistics and cache
+*.json
+stats.json
+data/stats.json
+dask-worker-space/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Test outputs
+test_outputs/
+*.tmp
+temp/
+
+# Documentation build
+docs/_build/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Project specific test/demo files
+test_inference_minimal.py
+quick_plot.py
+quick_test.py

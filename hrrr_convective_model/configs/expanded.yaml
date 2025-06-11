@@ -1,0 +1,67 @@
+data:
+  zarr: "data/zarr/expanded/hrrr_expanded.zarr"
+  stats: "data/stats_expanded.json"
+  # Surface variables
+  surface_variables: ["SP", "T2M", "D2M", "U10", "V10", "CAPE", "CIN", "REFC"]
+  # 3D variables at pressure levels
+  pressure_levels: [50, 100, 150, 200, 250, 300, 400, 500, 600, 700, 850, 925, 1000]
+  atmospheric_variables: ["Z", "T", "Q", "U", "V"]  # Will be expanded to Z_50, Z_100, etc.
+  # Forcing variables
+  forcing_variables: ["DSWRF", "DLWRF", "PWAT"]
+  # All variables combined (generated programmatically)
+  variables: null  # Will be populated by the dataset loader
+
+training:
+  lead_hours: 1          # 1-hour forecast steps for autoregression
+  max_lead_hours: 240    # 10-day forecasts as in the paper
+  batch_size: 4          # Adjusted for full resolution data
+  num_workers: 4
+  epochs: 20
+  lr: 1.0e-4
+  gradient_accumulation_steps: 4  # Effective batch size of 16
+  
+  # Data augmentation
+  random_crop: false     # Use full domain
+  
+  # Model architecture
+  base_features: 64      # Base feature size for U-Net
+  
+  # Training schedule
+  warmup_epochs: 2
+  lr_schedule: "cosine"
+  
+  # Checkpointing
+  checkpoint_every: 5    # Save every 5 epochs
+  validate_every: 1      # Validate every epoch
+
+diffusion:
+  # Diffusion model hyperparameters from DEF paper
+  timesteps: 1000        # T = 1000
+  beta_schedule: "cosine"
+  beta_start: 0.0001
+  beta_end: 0.02
+  
+  # Classifier-free guidance
+  guidance_weight: 0.1   # λ = 0.1
+  dropout_prob: 0.1      # 10% dropout for unconditional training
+  
+  # Sampling
+  sampler: "dpm_solver_pp"  # DPM-Solver++
+  solver_order: 2           # 2nd order solver
+  num_steps: 50            # 50 denoising steps
+  
+  # Training
+  ema_decay: 0.9999        # Exponential moving average
+
+ensemble:
+  num_members: 16         # B = 16 ensemble members
+  perturbation_samples: 8 # K = 8 perturbation samples
+  blend_weight: 0.95      # ω = 0.95 for blending
+
+evaluation:
+  # Variables to evaluate (following paper)
+  eval_variables: ["T_850", "Z_500", "Q_700", "U10", "V10", "T2M"]
+  # Lead times to evaluate (hours)
+  eval_lead_times: [6, 12, 24, 48, 72, 96, 120, 168, 240]
+  # Metrics
+  metrics: ["rmse", "crps", "energy_score", "spread", "bias"]

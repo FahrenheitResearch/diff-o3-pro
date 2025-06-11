@@ -1,0 +1,10 @@
+data:
+  zarr: "data/zarr/training_data/hrrr.zarr"
+  stats: "data/stats.json"
+  variables: ["REFC", "T2M", "D2M", "U10", "V10", "CAPE", "CIN"]
+training:
+  lead_hours: 1
+  batch_size: 1            # Reduced batch size for limited data
+  num_workers: 0           # Disable multiprocessing for debugging
+  epochs: 2                # Just test a couple epochs
+  lr: 1.0e-4

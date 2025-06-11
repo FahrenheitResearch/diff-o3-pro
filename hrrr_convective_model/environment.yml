@@ -1,0 +1,23 @@
+name: hrrr_convective_env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pytorch::pytorch=2.2
+  - pytorch::torchvision
+  - pytorch::torchaudio
+  - cudatoolkit=11.8
+  - cfgrib
+  - eccodes
+  - xarray
+  - zarr
+  - netcdf4
+  - numcodecs
+  - dask
+  - dask[distributed]
+  - pandas
+  - tqdm
+  - pyyaml
+  - hydra-core
+  - scikit-learn
+  - matplotlib
