@@ -489,12 +489,16 @@ def main():
         
         # Compute and print some basic statistics
         print("\nForecast statistics:")
-        for lead_hour in [6, 12, 24, 48, 72, 120, 240]:
-            if lead_hour <= args.max_lead_hours:
-                time_idx = lead_hour
-                t850_mean = forecast_ds[f"T_850_mean"].isel(time=time_idx).mean().item()
-                t850_spread = forecast_ds[f"T_850_spread"].isel(time=time_idx).mean().item()
-                print(f"  T@850hPa +{lead_hour:3d}h: mean={t850_mean:.2f}, spread={t850_spread:.2f}")
+        # Use T2M if T_850 is not available
+        temp_var = "T_850_mean" if "T_850_mean" in forecast_ds else "T2M_mean"
+        spread_var = "T_850_spread" if "T_850_spread" in forecast_ds else "T2M_spread"
+        
+        for lead_hour in range(1, min(args.max_lead_hours + 1, len(forecast_ds.time))):
+            if temp_var in forecast_ds:
+                temp_mean = forecast_ds[temp_var].isel(time=lead_hour-1).mean().item()
+                temp_spread = forecast_ds[spread_var].isel(time=lead_hour-1).mean().item()
+                var_label = "T@850hPa" if "850" in temp_var else "T@2m"
+                print(f"  {var_label} +{lead_hour:3d}h: mean={temp_mean:.2f}, spread={temp_spread:.2f}")
     
     print("\n✓ Ensemble forecast generation complete!")
 
