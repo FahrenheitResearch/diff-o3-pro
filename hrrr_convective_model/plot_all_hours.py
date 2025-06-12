@@ -10,8 +10,8 @@ from pathlib import Path
 
 # Load data
 print("Loading data...")
-ds = xr.open_dataset('forecasts/realtime/def_forecast_20250101_00Z.nc')
-store = zarr.open('data/zarr/test/hrrr.zarr', 'r')
+ds = xr.open_dataset('forecasts/realtime/def_forecast_20250611_20Z.nc')
+store = zarr.open('data/zarr/latest/hrrr.zarr', 'r')
 lat = store['latitude'][:]
 lon = store['longitude'][:]
 

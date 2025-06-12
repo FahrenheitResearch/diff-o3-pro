@@ -1,0 +1,53 @@
+data:
+  zarr: "data/zarr/training_4090/hrrr.zarr"
+  stats: "data/zarr/training_4090/stats.json"
+  variables: ["REFC", "T2M", "D2M", "U10", "V10", "CAPE", "CIN"]
+
+training:
+  lead_hours: 1
+  batch_size: 1
+  num_workers: 2  # Reduce CPU memory usage
+  epochs: 30
+  lr: 2.0e-4  # Slightly higher LR for faster convergence
+  gradient_accumulation_steps: 8
+  checkpoint_every: 5
+  validate_every: 2
+  base_features: 42
+  warmup_epochs: 1
+  lr_schedule: "cosine"
+  
+  # Memory optimization
+  pin_memory: true
+  persistent_workers: false  # Save memory
+  
+  # Stability
+  clip_grad_norm: 1.0
+  weight_decay: 1.0e-5
+  
+  # Mixed precision
+  use_amp: true
+  
+diffusion:
+  timesteps: 1000
+  beta_schedule: "cosine"
+  guidance_weight: 0.1
+  dropout_prob: 0.1
+  sampler: "dpm_solver_pp"
+  solver_order: 2
+  num_steps: 20  # Reduced for faster inference
+  ema_decay: 0.999  # Slightly lower for faster adaptation
+  
+  # Training
+  epochs: 20
+  batch_size: 1
+  gradient_accumulation_steps: 8
+
+ensemble:
+  num_members: 8  # Reduced for memory
+  perturbation_samples: 4
+  blend_weight: 0.95
+
+evaluation:
+  eval_variables: ["T2M", "REFC"]
+  eval_lead_times: [1, 6]
+  metrics: ["rmse", "crps"]

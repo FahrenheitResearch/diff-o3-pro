@@ -21,7 +21,9 @@ This project implements the **Diffusion-based Ensemble Forecasting (DEF)** syste
 - **Coverage**: CONUS domain at 3km resolution
 
 #### Data Preprocessing
-- **GRIB2 → Zarr Conversion**: `scripts/preprocess_to_zarr_simple.py`
+- **GRIB2 → Zarr Conversion**: `scripts/preprocess_hrrr_fixed.py` (WORKING!)
+  - Note: `preprocess_to_zarr_simple.py` has issues with filter_by_keys
+  - The `test_pipeline.sh` uses `preprocess_hrrr_fixed.py` which works correctly
 - **Variables Extracted**:
   ```python
   VARIABLES = {
@@ -35,7 +37,7 @@ This project implements the **Diffusion-based Ensemble Forecasting (DEF)** syste
   }
   ```
 - **Storage**: Zarr format with chunking for efficient access
-- **Normalization**: Z-score normalization with computed statistics
+- **Normalization**: Z-score normalization with `scripts/compute_stats.py`
 
 ### 2. Model Architecture
 
@@ -202,17 +204,26 @@ hrrr_convective_model/
 
 ### 1. Download HRRR Data
 ```bash
+# Download specific date/time (format: YYYYMMDD)
 python scripts/download_hrrr.py \
-    --date 2025-01-10 \
-    --cycles 4 \
-    --forecast_hours 0
+    --start-date 20250611 \
+    --hours 20 \
+    --output-dir data/raw/latest
+
+# Download F00 (analysis) files only - no forecast hours
 ```
 
-### 2. Convert to Zarr
+### 2. Convert to Zarr (USE THIS SCRIPT!)
 ```bash
-python scripts/preprocess_to_zarr_simple.py \
-    --input_dir data/raw \
-    --output_dir data/zarr/training
+# Use preprocess_hrrr_fixed.py - it actually works!
+python scripts/preprocess_hrrr_fixed.py \
+    --src data/raw/latest \
+    --out data/zarr/latest
+
+# Compute normalization statistics
+python scripts/compute_stats.py \
+    --zarr data/zarr/latest/hrrr.zarr \
+    --out data/zarr/latest/stats.json
 ```
 
 ### 3. Train Models
@@ -220,7 +231,7 @@ python scripts/preprocess_to_zarr_simple.py \
 # Train deterministic forecast model
 python train_forecast.py --config configs/test.yaml
 
-# Train diffusion model
+# Train diffusion model  
 python train_diffusion.py --config configs/test.yaml
 ```
 
@@ -228,22 +239,75 @@ python train_diffusion.py --config configs/test.yaml
 ```bash
 python inference_ensemble.py \
     --config configs/test.yaml \
-    --start-date "2025-01-01 00" \
+    --zarr-path data/zarr/latest/hrrr.zarr \
+    --start-date "2025-06-11 20" \
     --cycles 1 \
     --max-lead-hours 6 \
     --ensemble-size 4 \
     --device cuda \
-    --output-dir forecasts/realtime
+    --output-dir forecasts/latest
+
+# Note: Use --device cuda for GPU (fast) not cpu!
+# The --zarr-path overrides the config file path
 ```
 
 ### 5. Create Visualizations
 ```bash
+# Update plot_all_hours.py to point to your forecast file
+# Then run:
+python plot_all_hours.py
+
+# Creates hourly maps: forecast_f001.png through forecast_f006.png
 # Generate maps for all hours
 python plot_all_hours.py
 
 # Quick 4-panel view
 python quick_plot.py
 ```
+
+## Real-Time Forecasting Workflow (TESTED & WORKING)
+
+This is the complete workflow for generating a real forecast from the latest HRRR data:
+
+```bash
+# 1. Download latest HRRR analysis (e.g., 20Z)
+python scripts/download_hrrr.py \
+    --start-date 20250611 \
+    --hours 20 \
+    --output-dir data/raw/latest
+
+# 2. Convert to Zarr (MUST use preprocess_hrrr_fixed.py!)
+python scripts/preprocess_hrrr_fixed.py \
+    --src data/raw/latest \
+    --out data/zarr/latest
+
+# 3. Compute statistics
+python scripts/compute_stats.py \
+    --zarr data/zarr/latest/hrrr.zarr \
+    --out data/zarr/latest/stats.json
+
+# 4. Run ensemble forecast on GPU
+python inference_ensemble.py \
+    --config configs/test.yaml \
+    --zarr-path data/zarr/latest/hrrr.zarr \
+    --start-date "2025-06-11 20" \
+    --cycles 1 \
+    --max-lead-hours 6 \
+    --ensemble-size 4 \
+    --device cuda \
+    --output-dir forecasts/latest_real
+
+# 5. Generate visualization maps
+# First update the paths in plot_all_hours.py to point to your forecast
+# Then run:
+python plot_all_hours.py
+```
+
+### Important Notes:
+- **ALWAYS use `preprocess_hrrr_fixed.py`** - other preprocessing scripts have GRIB2 filter issues
+- **ALWAYS use `--device cuda`** for inference - CPU is extremely slow
+- **The data is still normalized** in the output - denormalization not yet implemented
+- **Test pipeline script (`test_pipeline.sh`)** contains the working commands
 
 ## What Needs to Be Done Next
 
