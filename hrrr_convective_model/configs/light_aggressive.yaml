@@ -1,0 +1,31 @@
+# Light but aggressive configuration to avoid OOM
+
+data:
+  zarr: 'data/zarr/training_14day/hrrr.zarr'
+  stats: 'data/zarr/training_14day/stats.json'
+  variables: ['REFC', 'T2M', 'D2M', 'U10', 'V10', 'CAPE', 'CIN']
+  epoch_start_hours: 473832
+
+training:
+  lead_hours: 1  
+  batch_size: 1
+  num_workers: 0  # No workers to save memory
+  epochs: 200  
+  lr: 0.005  # Still aggressive
+  weight_decay: 0.0  
+  gradient_accumulation_steps: 8  # More accumulation to simulate larger batch
+  checkpoint_every: 10
+  validate_every: 5  # Less frequent validation
+  base_features: 32  # Smaller model
+  warmup_epochs: 0  
+  lr_schedule: 'cosine'
+  use_small_model: true  # Use the small model variant
+  gradient_clip: 5.0
+  noise_std: 0.01
+  min_lr: 1e-5
+  
+# Memory optimizations
+memory:
+  empty_cache_every: 50  # Clear GPU cache every N batches
+  mixed_precision: true
+  pin_memory: false  # Don't pin memory

@@ -1,0 +1,10 @@
+Training Summary - 2025-06-13 02:38:52
+============================================================
+
+Model: Ultra-Minimal DDPM (81K params)
+Resolution: 1059 x 1799 (Full 3km HRRR)
+Data: Real HRRR - 14 days, 7 variables
+
+Epochs Completed: 4
+Latest Training Loss: 0.5996
+Loss Improvement: 37.5%

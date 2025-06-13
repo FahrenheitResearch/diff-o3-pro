@@ -1,0 +1,32 @@
+# Ultra-aggressive configuration to break through plateau
+
+data:
+  zarr: 'data/zarr/training_14day/hrrr.zarr'
+  stats: 'data/zarr/training_14day/stats.json'
+  variables: ['REFC', 'T2M', 'D2M', 'U10', 'V10', 'CAPE', 'CIN']
+  epoch_start_hours: 473832  # Jan 1 2024 00:00 UTC in hours since epoch
+
+training:
+  lead_hours: 1  
+  batch_size: 2  # Increase batch size
+  num_workers: 2 
+  epochs: 200  
+  lr: 0.1  # 10x more aggressive! 
+  weight_decay: 0.0  
+  gradient_accumulation_steps: 2  # Less accumulation
+  checkpoint_every: 10
+  validate_every: 2
+  base_features: 64  # Larger model capacity
+  warmup_epochs: 0  
+  lr_schedule: 'cosine'
+  use_small_model: false
+  gradient_clip: 10.0  # Very high clip
+  noise_std: 0.05  # More noise
+  min_lr: 1e-4  # Higher minimum
+  
+# Loss modifications
+loss_weights:
+  l1: 0.5      # Focus more on L1
+  spectral: 0.2  # Less spectral
+  mse: 0.2
+  gradient: 0.1

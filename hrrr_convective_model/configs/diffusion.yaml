@@ -1,0 +1,26 @@
+# Configuration for diffusion model training
+
+data:
+  zarr: 'data/zarr/training_14day/hrrr.zarr'
+  stats: 'data/zarr/training_14day/stats.json'
+  epoch_start_hours: 473832  # Jan 1 2024 00:00 UTC
+
+diffusion:
+  timesteps: 1000
+  beta_schedule: 'cosine'  # Better than linear for weather
+  epochs: 30  # Diffusion trains faster
+  batch_size: 2  # Can use slightly larger batch
+  lr: 0.0002
+  weight_decay: 0.0001
+  base_features: 32  # Smaller than forecast model
+  
+  # Sampling parameters (for inference)
+  sampler: 'dpm_solver_pp'
+  solver_order: 2
+  num_steps: 25  # Fast sampling
+  guidance_weight: 0.15  # Light guidance
+
+ensemble:
+  num_members: 10
+  perturbation_samples: 5  # K in the paper
+  blend_weight: 0.9  # omega - high means stay close to initial

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Plot all forecast hours."""
+"""Plot all forecast hours from denormalized data."""
 
 import numpy as np
 import xarray as xr
@@ -8,30 +8,10 @@ import matplotlib.colors as mcolors
 import zarr
 from pathlib import Path
 
-from utils.normalization import Normalizer
-
-# Path to normalization statistics
-STATS_PATH = Path('data/stats.json')
-
-# Initialize normalizer if stats file exists
-normalizer = Normalizer(STATS_PATH) if STATS_PATH.exists() else None
-
-def denorm(data, var):
-    """Apply denormalization if stats are available."""
-    if normalizer is None:
-        print(f"Warning: No normalizer available for {var}")
-        return data
-    return normalizer.decode(data, var)
-
 # Load data
 print("Loading data...")
-# Check if denormalized version exists
-denorm_file = Path('forecasts/latest_real/def_forecast_20250612_18Z_denorm.nc')
-if denorm_file.exists():
-    print("Using denormalized forecast data")
-    ds = xr.open_dataset(denorm_file)
-else:
-    ds = xr.open_dataset('forecasts/latest_real/def_forecast_20250612_18Z.nc')
+# Use denormalized forecast
+ds = xr.open_dataset('forecasts/latest_real/def_forecast_20250612_18Z_denorm.nc')
 store = zarr.open('data/zarr/latest/hrrr.zarr', 'r')
 lat = store['latitude'][:]
 lon = store['longitude'][:]
@@ -90,9 +70,6 @@ for t_idx in range(n_hours):
         
         # Get ensemble mean
         data = ds.REFC.isel(time=t_idx).mean(dim='member').values
-        # Only denormalize if not already denormalized
-        if 'normalized' not in ds.attrs or ds.attrs['normalized'] != 'False':
-            data = denorm(data, 'REFC')
         
         # Mask out very low reflectivity values (noise)
         cfg = var_configs['REFC']
@@ -115,9 +92,8 @@ for t_idx in range(n_hours):
     if 'T2M' in ds:
         fig, ax = plt.subplots(figsize=(10, 8))
         
-        # Get ensemble mean and denormalize
+        # Get ensemble mean
         data = ds.T2M.isel(time=t_idx).mean(dim='member').values
-        data = denorm(data, 'T2M')
         
         # Convert K to C
         cfg = var_configs['T2M']
@@ -140,9 +116,8 @@ for t_idx in range(n_hours):
     if 'CAPE' in ds:
         fig, ax = plt.subplots(figsize=(10, 8))
         
-        # Get ensemble mean and denormalize
+        # Get ensemble mean
         data = ds.CAPE.isel(time=t_idx).mean(dim='member').values
-        data = denorm(data, 'CAPE')
         
         # Mask negative values
         cfg = var_configs['CAPE']
@@ -165,11 +140,9 @@ for t_idx in range(n_hours):
     if 'U10' in ds and 'V10' in ds:
         fig, ax = plt.subplots(figsize=(10, 8))
         
-        # Get ensemble mean and denormalize
+        # Get ensemble mean
         u = ds.U10.isel(time=t_idx).mean(dim='member').values
         v = ds.V10.isel(time=t_idx).mean(dim='member').values
-        u = denorm(u, 'U10')
-        v = denorm(v, 'V10')
         wspd = np.sqrt(u**2 + v**2)
         
         cfg = var_configs['wind']
@@ -189,10 +162,8 @@ for t_idx in range(n_hours):
     if 'REFC' in ds:
         fig, ax = plt.subplots(figsize=(10, 8))
         
-        # Get all members and denormalize each one
-        members = ds.REFC.isel(time=t_idx).values
-        members_denorm = np.array([denorm(members[i], 'REFC') for i in range(members.shape[0])])
-        data = np.std(members_denorm, axis=0)
+        # Get ensemble spread
+        data = ds.REFC.isel(time=t_idx).std(dim='member').values
         
         im = ax.imshow(data, origin='lower', cmap='plasma', aspect='auto', vmin=0, vmax=15)
         plt.colorbar(im, ax=ax, label='Std Dev (dBZ)')
@@ -209,10 +180,10 @@ for t_idx in range(n_hours):
     if 'T2M' in ds:
         fig, ax = plt.subplots(figsize=(10, 8))
         
-        # Get all members and denormalize each one
-        members = ds.T2M.isel(time=t_idx).values
-        members_denorm = np.array([denorm(members[i], 'T2M') - 273.15 for i in range(members.shape[0])])
-        data = np.std(members_denorm, axis=0)
+        # Get ensemble spread
+        data_k = ds.T2M.isel(time=t_idx).values
+        data_c = data_k - 273.15  # Convert to Celsius
+        data = np.std(data_c, axis=0)
         
         im = ax.imshow(data, origin='lower', cmap='plasma', aspect='auto', vmin=0, vmax=5)
         plt.colorbar(im, ax=ax, label='Std Dev (°C)')
@@ -234,7 +205,6 @@ for t_idx in range(min(6, n_hours)):
     ax = axes[t_idx]
     if 'REFC' in ds:
         data = ds.REFC.isel(time=t_idx).mean(dim='member').values
-        data = denorm(data, 'REFC')
         # Mask out very low reflectivity values (noise)
         data = np.where(data < -10, np.nan, data)
         im = ax.imshow(data, origin='lower', cmap='turbo', aspect='auto', vmin=-10, vmax=60)

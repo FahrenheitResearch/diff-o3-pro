@@ -1,0 +1,33 @@
+# Aggressive but stable configuration
+
+data:
+  zarr: 'data/zarr/training_14day/hrrr.zarr'
+  stats: 'data/zarr/training_14day/stats.json'
+  variables: ['REFC', 'T2M', 'D2M', 'U10', 'V10', 'CAPE', 'CIN']
+  epoch_start_hours: 473832
+
+training:
+  lead_hours: 1  
+  batch_size: 1
+  num_workers: 2 
+  epochs: 200  
+  lr: 0.02  # Still very aggressive but not crazy
+  weight_decay: 0.0  
+  gradient_accumulation_steps: 4
+  checkpoint_every: 10
+  validate_every: 2
+  base_features: 48  # Slightly larger than before
+  warmup_epochs: 0  
+  lr_schedule: 'onecycle'  # Try OneCycle instead of cosine
+  use_small_model: false
+  gradient_clip: 5.0
+  noise_std: 0.02
+  min_lr: 5e-5
+  
+# Different scheduler settings
+scheduler:
+  max_lr: 0.02
+  pct_start: 0.3  # 30% of training for warmup
+  anneal_strategy: 'cos'
+  div_factor: 25.0  # Start at max_lr/25
+  final_div_factor: 1000.0  # End at max_lr/1000

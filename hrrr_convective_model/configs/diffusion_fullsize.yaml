@@ -1,0 +1,36 @@
+# Full-size faithful DDPM config
+# 100% faithful to DEF - trains at full 1059x1799 resolution
+
+data:
+  zarr: 'data/zarr/training_14day/hrrr.zarr'
+  stats: 'data/zarr/training_14day/stats.json'
+  variables: ['REFC', 'T2M', 'D2M', 'U10', 'V10', 'CAPE', 'CIN']
+  
+model:
+  type: "ddpm_fullsize"
+  base_dim: 32  # Can go up to ~48 for more params
+  in_channels: 7
+  out_channels: 7
+  
+diffusion:
+  timesteps: 1000  # Full 1000 steps
+  s: 0.008
+  
+training:
+  lead_hours: 1
+  batch_size: 1  # Always 1 for full res
+  gradient_accumulation: 8  # Effective batch 8
+  num_workers: 0
+  epochs: 100
+  lr: 0.0001
+  weight_decay: 0.01
+  gradient_clip: 1.0
+  val_interval: 10
+  save_interval: 5
+  checkpoint_dir: 'checkpoints'
+  
+memory:
+  empty_cache_interval: 50
+  
+logging:
+  log_every_n_steps: 10

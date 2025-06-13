@@ -1,0 +1,27 @@
+# Configuration for deterministic weather forecasting with fixes
+
+data:
+  zarr: 'data/zarr/training_14day/hrrr.zarr'
+  stats: 'data/zarr/training_14day/stats.json'
+  variables: ['REFC', 'T2M', 'D2M', 'U10', 'V10', 'CAPE', 'CIN']
+  epoch_start_hours: 473832  # Jan 1 2024 00:00 UTC in hours since epoch
+
+training:
+  lead_hours: 1  # Predict 1 hour ahead (not 6!)
+  batch_size: 1  # Reduced to save VRAM
+  num_workers: 2  # Reduced workers
+  epochs: 200  # Much longer training
+  lr: 0.01  # Very aggressive learning rate
+  weight_decay: 0.0  # Remove regularization initially
+  gradient_accumulation_steps: 4  # Reduced for faster updates
+  checkpoint_every: 10
+  validate_every: 2
+  base_features: 40  # Reduced model size to save VRAM
+  warmup_epochs: 0  # No warmup - start aggressive
+  lr_schedule: 'cosine'
+  use_small_model: false
+  gradient_clip: 5.0  # Allow larger gradients
+  noise_std: 0.01  # Add noise for symmetry breaking
+
+# Loss weights (defined in code)
+# l1: 0.4, spectral: 0.3, mse: 0.2, gradient: 0.1

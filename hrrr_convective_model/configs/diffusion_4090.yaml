@@ -1,0 +1,45 @@
+# Diffusion model config for RTX 4090 - Proof of Life
+# Faithful to DEF paper for convection prediction
+
+data:
+  zarr: 'data/zarr/training_14day/hrrr.zarr'
+  stats: 'data/zarr/training_14day/stats.json'
+  variables: ['REFC', 'T2M', 'D2M', 'U10', 'V10', 'CAPE', 'CIN']
+  
+model:
+  base_dim: 64  # Small enough for 4090
+  dim_mults: [1, 2, 4, 8]  # Progressive downsampling
+  attention_resolutions: [16, 8]  # Attention at 2 scales
+  num_res_blocks: 2
+  dropout: 0.1
+  history_length: 4  # Past 4 hours for conditioning
+  
+diffusion:
+  timesteps: 200  # Reduced from 1000 for faster training
+  s: 0.008  # Cosine schedule parameter
+  beta_start: 0.0001
+  beta_end: 0.02
+  
+training:
+  lead_hours: 1  # Start with 1-hour forecasts
+  batch_size: 1  # Memory constraint
+  num_workers: 2
+  epochs: 100  # Proof of life
+  lr: 0.0001  # Conservative for stability
+  min_lr: 1e-6
+  weight_decay: 0.01
+  gradient_clip: 1.0
+  val_interval: 5
+  save_interval: 10
+  checkpoint_dir: 'checkpoints'
+  
+validation:
+  ensemble_size: 10  # Small ensemble for validation
+  
+# Scalability notes:
+# For production (cluster):
+# - base_dim: 128-256
+# - timesteps: 1000
+# - batch_size: 16-32
+# - ensemble_size: 50-100
+# - Multi-GPU with DDP

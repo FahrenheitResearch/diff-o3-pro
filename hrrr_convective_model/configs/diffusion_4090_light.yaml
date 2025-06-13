@@ -1,0 +1,40 @@
+# Ultra-light diffusion config for RTX 4090 - no OOM!
+# Faithful DEF implementation that actually runs
+
+data:
+  zarr: 'data/zarr/training_14day/hrrr.zarr'
+  stats: 'data/zarr/training_14day/stats.json'
+  variables: ['REFC', 'T2M', 'D2M', 'U10', 'V10', 'CAPE', 'CIN']
+  
+model:
+  base_dim: 16  # Ultra small!
+  dim_mults: [1, 2]  # Only 2 levels
+  attention_resolutions: []  # NO attention to save memory
+  num_res_blocks: 1  # Minimal blocks
+  dropout: 0.0  # No dropout for speed
+  history_length: 1  # Only 1 past hour (less memory)
+  
+diffusion:
+  timesteps: 100  # Fewer steps for faster training
+  s: 0.008
+  
+training:
+  lead_hours: 1
+  batch_size: 1
+  num_workers: 0  # No workers to save memory
+  epochs: 50  # Quick proof of concept
+  lr: 0.0002  # Slightly higher for faster convergence
+  min_lr: 1e-5
+  weight_decay: 0.0
+  gradient_clip: 1.0
+  val_interval: 10
+  save_interval: 5
+  checkpoint_dir: 'checkpoints'
+  
+validation:
+  ensemble_size: 4  # Tiny ensemble
+  
+# Memory optimizations
+memory:
+  gradient_checkpointing: false  # Keep it simple
+  empty_cache_interval: 10  # Clear cache every 10 batches

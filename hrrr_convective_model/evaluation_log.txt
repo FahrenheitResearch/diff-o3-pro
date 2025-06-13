@@ -1,0 +1,6 @@
+Loading checkpoint: checkpoints/diffusion_fullres_final/best_model.pt
+Model loaded from epoch 124
+Training loss: 0.0735
+
+Generating 50 ensemble members...
+Ensemble generation:   0%|          | 0/50 [00:00<?, ?it/s]Ensemble generation:   2%|▏         | 1/50 [00:13<11:07, 13.62s/it]Ensemble generation:   4%|▍         | 2/50 [00:23<09:19, 11.66s/it]Ensemble generation:   6%|▌         | 3/50 [00:33<08:31, 10.89s/it]Ensemble generation:   8%|▊         | 4/50 [00:46<08:51, 11.55s/it]Ensemble generation:  10%|█         | 5/50 [00:54<07:43, 10.31s/it]Ensemble generation:  12%|█▏        | 6/50 [01:02<06:59,  9.54s/it]Ensemble generation:  14%|█▍        | 7/50 [01:10<06:33,  9.15s/it]Ensemble generation:  16%|█▌        | 8/50 [01:23<07:14, 10.34s/it]Ensemble generation:  18%|█▊        | 9/50 [01:33<06:58, 10.20s/it]Ensemble generation:  20%|██        | 10/50 [01:43<06:46, 10.16s/it]Ensemble generation:  22%|██▏       | 11/50 [01:56<07:12, 11.08s/it]Ensemble generation:  24%|██▍       | 12/50 [02:07<06:50, 10.81s/it]

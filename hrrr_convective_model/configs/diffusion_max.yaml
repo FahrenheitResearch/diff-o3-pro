@@ -1,0 +1,49 @@
+# Maximum size faithful DDPM for RTX 4090 (18GB target)
+# 100% faithful to DEF paper - predicts NOISE
+
+data:
+  zarr: 'data/zarr/training_14day/hrrr.zarr'
+  stats: 'data/zarr/training_14day/stats.json'
+  variables: ['REFC', 'T2M', 'D2M', 'U10', 'V10', 'CAPE', 'CIN']
+  
+model:
+  type: "ddpm_max"
+  base_dim: 48  # ~28M parameters, fits in 18GB
+  in_channels: 7
+  out_channels: 7
+  
+diffusion:
+  timesteps: 1000  # Full 1000 steps like DEF
+  s: 0.008  # Cosine schedule parameter
+  
+training:
+  lead_hours: 1
+  batch_size: 1  # Always 1 for full resolution
+  gradient_accumulation: 8  # Effective batch size of 8
+  num_workers: 2
+  epochs: 200
+  lr: 0.00005  # Conservative LR for large model
+  lr_scheduler: "cosine"
+  min_lr: 1e-6
+  warmup_steps: 1000
+  weight_decay: 0.01
+  gradient_clip: 1.0
+  val_interval: 10
+  save_interval: 5
+  checkpoint_dir: 'checkpoints'
+  
+  # Memory optimizations
+  mixed_precision: true  # FP16 training
+  gradient_checkpointing: false  # Enable if OOM
+  ema_decay: 0.9999  # Exponential moving average
+  
+validation:
+  ensemble_size: 20  # 20 member ensemble
+  sample_every_n_epochs: 10
+  
+memory:
+  empty_cache_interval: 10  # Clear cache every 10 batches
+  
+logging:
+  log_every_n_steps: 10
+  use_wandb: false  # Set to true if you want wandb logging

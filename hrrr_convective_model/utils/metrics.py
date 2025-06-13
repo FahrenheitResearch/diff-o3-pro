@@ -241,6 +241,30 @@ def reliability_diagram(obs: torch.Tensor, ens_prob: torch.Tensor,
     return forecast_probs, observed_freq
 
 
+def spread_error_ratio(ensemble_preds: torch.Tensor, truth: torch.Tensor) -> torch.Tensor:
+    """Compute spread-error ratio for ensemble calibration.
+    
+    Well-calibrated ensembles should have ratio ≈ 1.
+    
+    Args:
+        ensemble_preds: Ensemble predictions [M, B, C, H, W]
+        truth: Ground truth [B, C, H, W]
+    
+    Returns:
+        Spread-error ratio
+    """
+    # Compute ensemble spread
+    spread = ensemble_preds.std(dim=0).mean()
+    
+    # Compute ensemble mean
+    ens_mean = ensemble_preds.mean(dim=0)
+    
+    # Compute RMSE of ensemble mean
+    error = torch.sqrt(((ens_mean - truth) ** 2).mean())
+    
+    return spread / (error + 1e-8)
+
+
 def spread_skill_ratio(spread: torch.Tensor, rmse: torch.Tensor) -> torch.Tensor:
     """Compute spread-skill ratio.
     

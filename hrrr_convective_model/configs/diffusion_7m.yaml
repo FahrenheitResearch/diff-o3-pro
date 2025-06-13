@@ -1,0 +1,40 @@
+# 7M parameter faithful DDPM config for RTX 4090
+# 100% faithful to DEF paper
+
+data:
+  zarr: 'data/zarr/training_14day/hrrr.zarr'
+  stats: 'data/zarr/training_14day/stats.json'
+  variables: ['REFC', 'T2M', 'D2M', 'U10', 'V10', 'CAPE', 'CIN']
+  
+model:
+  type: "ddpm_7m"
+  base_dim: 64  # 64 -> 128 -> 256 -> 512 channels
+  in_channels: 7
+  out_channels: 7
+  
+diffusion:
+  timesteps: 1000  # Full 1000 steps like DEF paper
+  s: 0.008  # Cosine schedule parameter
+  
+training:
+  lead_hours: 1
+  batch_size: 1  # Keep at 1 for memory
+  accumulate_grad_batches: 4  # Effective batch size of 4
+  num_workers: 2
+  epochs: 100
+  lr: 0.0001  # Lower LR for larger model
+  min_lr: 1e-6
+  weight_decay: 0.01
+  gradient_clip: 1.0
+  val_interval: 10
+  save_interval: 5
+  checkpoint_dir: 'checkpoints'
+  ema_decay: 0.9999  # EMA for better generation
+  
+validation:
+  ensemble_size: 10  # Generate 10 member ensemble
+  
+memory:
+  gradient_checkpointing: false  # Enable if OOM
+  mixed_precision: true  # Use AMP
+  empty_cache_interval: 50
