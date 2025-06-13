@@ -1,0 +1,53 @@
+data:
+  zarr: "data/zarr/test_quick/hrrr.zarr"
+  stats: "data/zarr/test_quick/stats.json"
+  variables: ["REFC", "T2M", "D2M", "U10", "V10", "CAPE", "CIN"]
+
+training:
+  lead_hours: 6  # Just test up to 6 hours
+  batch_size: 1
+  num_workers: 2
+  epochs: 2
+  lr: 2.0e-4
+  gradient_accumulation_steps: 2
+  checkpoint_every: 1
+  validate_every: 1
+  base_features: 32
+  warmup_epochs: 0
+  lr_schedule: "constant"
+  sequence_length: 7  # F00-F06
+  
+  # Disable fancy features for quick test
+  use_temporal_encoding: false
+  curriculum_learning: false
+  
+  # Memory optimization
+  pin_memory: true
+  persistent_workers: false
+  
+  # Mixed precision
+  use_amp: true
+  
+diffusion:
+  timesteps: 100  # Fewer timesteps for quick test
+  beta_schedule: "linear"
+  guidance_weight: 0.1
+  dropout_prob: 0.1
+  sampler: "ddpm"
+  num_steps: 10
+  ema_decay: 0.999
+  
+  # Training
+  epochs: 2
+  batch_size: 1
+  gradient_accumulation_steps: 2
+
+ensemble:
+  num_members: 2
+  perturbation_samples: 2
+  blend_weight: 0.95
+
+evaluation:
+  eval_variables: ["T2M", "REFC"]
+  eval_lead_times: [1, 6]
+  metrics: ["rmse"]

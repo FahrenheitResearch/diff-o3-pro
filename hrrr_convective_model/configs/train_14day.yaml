@@ -1,0 +1,73 @@
+data:
+  zarr: "data/zarr/training_14day/hrrr.zarr"
+  stats: "data/zarr/training_14day/stats.json"
+  variables: ["REFC", "T2M", "D2M", "U10", "V10", "CAPE", "CIN"]
+
+training:
+  lead_hours: 6  # Train on F00-F06
+  batch_size: 1
+  num_workers: 2  # Reduce workers to save memory
+  epochs: 50
+  lr: 2.0e-4  # Good learning rate for this data size
+  gradient_accumulation_steps: 32
+  checkpoint_every: 5
+  validate_every: 2
+  base_features: 40
+  warmup_epochs: 2
+  lr_schedule: "cosine_with_restarts"
+  sequence_length: 7  # 7 timesteps (F00-F06)
+  
+  # Sequence learning improvements
+  use_temporal_encoding: true
+  temporal_dropout: 0.1
+  
+  # No curriculum learning needed for 6-hour forecasts
+  curriculum_learning: false
+  
+  # Memory optimization
+  pin_memory: false  # Disable to save memory
+  persistent_workers: false  # Disable to save memory
+  
+  # Stability
+  clip_grad_norm: 1.0
+  weight_decay: 1.0e-5
+  
+  # Mixed precision
+  use_amp: true
+  amp_dtype: "float16"  # Use fp16 to save memory
+  
+  # Data augmentation - disabled to save memory
+  augment_probability: 0.0
+  
+  # Additional memory optimizations
+  checkpoint_activations: false  # Don't save activations
+  empty_cache_freq: 10  # Clear cache every 10 batches
+  
+diffusion:
+  timesteps: 1000
+  beta_schedule: "cosine"
+  guidance_weight: 0.15
+  dropout_prob: 0.1
+  sampler: "dpm_solver_pp"
+  solver_order: 2
+  num_steps: 25  # Balanced quality/speed
+  ema_decay: 0.9995
+  
+  # Training
+  epochs: 30
+  batch_size: 1
+  gradient_accumulation_steps: 32
+  
+  # Temporal consistency for 6-hour sequences
+  temporal_weight: 0.2
+  noise_schedule: "linear"
+
+ensemble:
+  num_members: 10  # More members with better data
+  perturbation_samples: 5
+  blend_weight: 0.9
+
+evaluation:
+  eval_variables: ["T2M", "REFC", "U10", "V10"]
+  eval_lead_times: [1, 3, 6]
+  metrics: ["rmse", "crps", "mae"]

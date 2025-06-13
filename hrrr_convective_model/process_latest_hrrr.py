@@ -116,7 +116,7 @@ def process_hrrr(grib_file, output_dir):
     return zarr_path
 
 if __name__ == "__main__":
-    grib_file = "data/raw/latest/hrrr.20250611.t20z.wrfprsf00.grib2"
+    grib_file = "data/raw/training_14day/hrrr.20250611.t18z.wrfprsf06.grib2"
     output_dir = "data/zarr/latest"
     
     zarr_path = process_hrrr(grib_file, output_dir)

@@ -82,12 +82,12 @@ class HRRRForecastDataset(Dataset):
         for var in self.vars:
             # Load and normalize input
             input_raw = self.store[var][input_idx, :, :]
-            input_norm = self.norm.normalize(input_raw, var)
+            input_norm = self.norm.encode(input_raw, var)
             input_data.append(input_norm)
             
             # Load and normalize target
             target_raw = self.store[var][target_idx, :, :]
-            target_norm = self.norm.normalize(target_raw, var)
+            target_norm = self.norm.encode(target_raw, var)
             target_data.append(target_norm)
         
         # Stack variables along channel dimension
